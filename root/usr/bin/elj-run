@@ -1,6 +1,6 @@
 #!/bin/bash
 
-source /etc/elj.d/*
+for f in /etc/elj.d/*; do source $f; done
 
 #############
 # FUNCTIONS #
