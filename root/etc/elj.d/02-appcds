@@ -1,2 +1,3 @@
 APPCDS_DIR="/var/cache/elj/appcds"
 CDS_MODE=cds
+APP_ID=app
