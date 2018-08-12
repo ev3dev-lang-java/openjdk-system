@@ -33,9 +33,9 @@ Model
 /usr/lib/jvm/jdk3
   - system-managed Java versions
 
-/var/cache/elj/appcds/${ID1}
-/var/cache/elj/appcds/${ID2}
-/var/cache/elj/appcds/${ID3}
+/home/robot/appcds/${ID1}
+/home/robot/appcds/${ID2}
+/home/robot/appcds/${ID3}
   - AppCDS caches
 
 /usr/lib/elj/jar

@@ -171,6 +171,7 @@ if [ ! -z "$MOD_FILE" ]; then
 fi
 
 if [ "$CDS_DUMP" == "1" ]; then
+    mkdir -p "${APPCDS_DIR}"
     if [ "$CDS_MODE" == "none" ]; then
         echo "Nothing to dump."
         exit 0
