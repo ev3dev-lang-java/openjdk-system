@@ -7,10 +7,10 @@ Model
 -----
 
 ```
-/opt/elj/bin/elj-change-java
+/usr/bin/elj-change-java
   - change ELJ java
 
-/opt/elj/bin/elj-shjar
+/usr/bin/elj-shjar
   - build shjar
     - per-app config
       - java path
@@ -19,36 +19,36 @@ Model
       - jarpath
       - modulepath
 
-/opt/elj/bin/elj-run
+/usr/bin/elj-run
   - run JAR file manually
 
-/opt/elj/etc.d/01-selected-java
+/etc/elj.d/01-selected-java
   - JAVA_HOME
 
-/opt/elj/etc.d/02-default-flags
+/etc/elj.d/02-default-flags
   - additional Java flags
 
-/opt/elj/etc.d/03-appcds
+/etc/elj.d/03-appcds
   - AppCDS base path
 
-/opt/elj/etc.d/04-default-paths
+/etc/elj.d/04-default-paths
   - jarpath/classpath/modulepath
 
-/opt/elj/runtimes/jri1
-/opt/elj/runtimes/jri2
-/opt/elj/runtimes/jdk3
+/usr/lib/elj/runtimes/jri1
+/usr/lib/elj/runtimes/jri2
+/usr/lib/elj/runtimes/jdk3
   - JRIs/JDKs
 
-/opt/elj/appcds/${ID1}
-/opt/elj/appcds/${ID2}
-/opt/elj/appcds/${ID3}
+/var/cache/elj/appcds/${ID1}
+/var/cache/elj/appcds/${ID2}
+/var/cache/elj/appcds/${ID3}
   - AppCDS caches
 
-/opt/elj/lib/jar
+/usr/lib/elj/jar
   - libA.jar
   - libB.jar
 
-/opt/elj/lib/jmod
+/usr/lib/elj/jmod
   - libC.jmod
   - libD.jmod
 
