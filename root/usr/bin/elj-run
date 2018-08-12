@@ -94,8 +94,8 @@ function printhelp() {
     echo "  --extra-jvm-flags '<flags>'    Append flags to java invocation." >&2
     echo "  --extra-class-path '<paths>'   Prepend classpath with additional paths." >&2
     echo "  --extra-module-path '<paths>'  Prepend modulepath with additional paths." >&2
-    echo "  --jar <path>                   Path to program JAR. If not set, classpath will be searched." >&2
-    echo "  --mod <path>                   Name of program module. If not set, modulepath will be searched." >&2
+    echo "  --program <path>               Path to program JAR. Only used when --mod is not used." >&2
+    echo "  --mod <path>                   Name of program module. If set, sets mode to JMOD" >&2
 }
 
 #################
@@ -107,7 +107,7 @@ if [ "$#" -eq 0 ]; then
     exit 1
 fi
 
-OPTSTR="$(getopt -o "" -l "help,dump,app-id:,java-exe:,extra-jvm-flags:,cds-mode:,appcds-dir:,extra-class-path:,extra-module-path:,jar:,mod:;class:" -n 'elj-run' -- "$@")"
+OPTSTR="$(getopt -o "" -l "help,dump,app-id:,java-exe:,extra-jvm-flags:,cds-mode:,appcds-dir:,extra-class-path:,extra-module-path:,program:,mod:" -n 'elj-run' -- "$@")"
 OPTRET="$?"
 if [ "$OPTRET" -ne 0 ]; then
   exit 1
@@ -150,7 +150,7 @@ while true ; do
     --extra-module-path)
         MODULE_PATH="$2:$MODULE_PATH"
         shift 2 ;;
-    --jar)
+    --program)
         JAR_FILE="$2"
         shift 2 ;;
     --mod)
@@ -165,6 +165,10 @@ done
 ##############
 # MAIN LOGIC #
 ##############
+
+if [ ! -z "$MOD_FILE" ]; then
+    unset JAR_FILE
+fi
 
 if [ "$CDS_DUMP" == "1" ]; then
     if [ "$CDS_MODE" == "none" ]; then
@@ -197,5 +201,5 @@ else
     CDS_FLAGS="$(get_cds_flags)"
     PRGSPEC="$(get_program_specifier)"
 
-    "$JAVA_EXE" -cp "$CLASS_PATH" -p "$MODULE_PATH" $JAVA_FLAGS $CDS_FLAGS $PRGSPEC "$@"
+    exec "$JAVA_EXE" -cp "$CLASS_PATH" -p "$MODULE_PATH" $JAVA_FLAGS $CDS_FLAGS $PRGSPEC "$@"
 fi
