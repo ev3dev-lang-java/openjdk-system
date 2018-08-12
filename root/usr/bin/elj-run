@@ -10,7 +10,7 @@ for f in /etc/elj.d/*; do source $f; done
 function appcds_dump_classes_flags() {
     echo -n " -XX:+UnlockDiagnosticVMOptions"
     echo -n " -XX:+UseAppCDS"
-    echo -n " -XX:DumpLoadedClassList=\"${APPCDS_DIR}/${APP_ID}.lst\""
+    echo -n " -XX:DumpLoadedClassList=${APPCDS_DIR}/${APP_ID}.lst"
 }
 
 # Dump AppCDS data
@@ -18,8 +18,8 @@ function appcds_dump_cache_flags() {
     echo -n " -XX:+UnlockDiagnosticVMOptions"
     echo -n " -XX:+UseAppCDS"
     echo -n " -Xshare:dump"
-    echo -n " -XX:SharedClassListFile=\"${APPCDS_DIR}/${APP_ID}.lst\""
-    echo -n " -XX:SharedArchiveFile=\"${APPCDS_DIR}/${APP_ID}.jsa\""
+    echo -n " -XX:SharedClassListFile=${APPCDS_DIR}/${APP_ID}.lst"
+    echo -n " -XX:SharedArchiveFile=${APPCDS_DIR}/${APP_ID}.jsa"
 }
 
 # Use AppCDS data
@@ -27,12 +27,12 @@ function appcds_run_flags() {
     echo -n " -XX:+UnlockDiagnosticVMOptions"
     echo -n " -XX:+UseAppCDS"
     echo -n " -Xshare:on"
-    echo -n " -XX:SharedArchiveFile=\"${APPCDS_DIR}/${APP_ID}.jsa\""
+    echo -n " -XX:SharedArchiveFile=${APPCDS_DIR}/${APP_ID}.jsa"
 }
 
 # Dump CDS data
 function do_cds_dump() {
-    java -XX:+UnlockDiagnosticVMOptions -Xshare:dump -XX:SharedArchiveFile="${APPCDS_DIR}/cds.jsa"
+    java -XX:+UnlockDiagnosticVMOptions -Xshare:dump -XX:SharedArchiveFile=${APPCDS_DIR}/cds.jsa
     return $?
 }
 
@@ -41,7 +41,7 @@ function cds_run_flags() {
     echo -n " -XX:+UnlockDiagnosticVMOptions"
     echo -n " -XX:-UseAppCDS"
     echo -n " -Xshare:on"
-    echo -n " -XX:SharedArchiveFile=\"${APPCDS_DIR}/cds.jsa\""
+    echo -n " -XX:SharedArchiveFile=${APPCDS_DIR}/cds.jsa"
 }
 
 # Do not use any CDS
@@ -188,9 +188,6 @@ if [ "$CDS_DUMP" == "1" ]; then
         "$JAVA_EXE" -cp "$CLASS_PATH" -p "$MODULE_PATH" $JAVA_FLAGS $(appcds_dump_classes_flags) $PRGSPEC "$@"
 
         echo "Dumping AppCDS data."
-        if [ "$JAR_FILE" ]; then
-            CLASS_PATH="$CLASS_PATH:$JAR_FILE"
-        fi
         "$JAVA_EXE" -cp "$CLASS_PATH" -p "$MODULE_PATH" $JAVA_FLAGS $(appcds_dump_cache_flags)
         exit $?
     else
