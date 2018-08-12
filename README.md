@@ -34,9 +34,9 @@ Model
 /etc/elj.d/04-default-paths
   - jarpath/classpath/modulepath
 
-/usr/lib/elj/runtimes/jri1
-/usr/lib/elj/runtimes/jri2
-/usr/lib/elj/runtimes/jdk3
+/usr/lib/jvm/jri1
+/usr/lib/jvm/jri2
+/usr/lib/jvm/jdk3
   - JRIs/JDKs
 
 /var/cache/elj/appcds/${ID1}
