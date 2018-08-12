@@ -18,7 +18,7 @@ else
     if [ ! -z "$ELJ_DUMP" ]; then
         DUMP_ARG="--dump"
     fi
-    exec elj-run %ELJ_ARGS% $DUMP_ARG --jar "$SELF" %MOD_SPEC% -- %ELJ_POSTARGS% "$@"
+    exec elj-run %ELJ_ARGS% $DUMP_ARG --program "$SELF" %MOD_SPEC% -- %ELJ_POSTARGS% "$@"
 fi
 
 exit 0
