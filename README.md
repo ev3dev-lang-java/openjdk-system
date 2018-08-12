@@ -6,6 +6,7 @@ This repo contains shell scripts integrating Java to ev3dev.
 Model
 -----
 
+```
 /opt/elj/bin/elj-change-java
   - change ELJ java
 
@@ -55,3 +56,4 @@ Model
   - run application
   - change its config
   - rebuild appcds cache
+```
