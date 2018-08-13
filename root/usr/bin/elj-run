@@ -6,13 +6,6 @@ unset MOD_NAME
 unset APPCDS_NAME
 unset APPCDS_FLUSH
 
-# load system config
-for f in /etc/elj.d/*; do source $f; done
-
-#############
-# FUNCTIONS #
-#############
-
 # prepend *path
 function prepend_path() {
     if [ -z "$1" ]; then
@@ -30,6 +23,13 @@ function append_path() {
         echo "$1:$2"
     fi
 }
+
+# load system config
+for f in /etc/elj.d/*; do source $f; done
+
+#############
+# FUNCTIONS #
+#############
 
 # Dump AppCDS class list
 function appcds_app_lst() {
