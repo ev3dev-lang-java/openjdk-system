@@ -1,3 +1,10 @@
+elj-base (1.0.2-1) stretch; urgency=low
+
+  * Move build script to debian directory
+
+ -- Jakub Vaněk (http://jakubvanekpc.jecool.net/) <linuxtardis@gmail.com>  Mon, 13 Aug 2018 23:42:34 +0200
+
+
 elj-base (1.0.1-2) stretch; urgency=low
 
   * Test signing
