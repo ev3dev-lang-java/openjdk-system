@@ -1,2 +1,10 @@
-CLASS_PATH="/home/robot/jar:/usr/lib/elj/jar"
+###
+# ev3dev-lang-java configuration
+
+## Library-related flags
+
+# Java classpath. This needs to contain only JARs for AppCDS to work.
+CLASS_PATH=""
+
+# Java modulepath. This probably does not interfere with AppCDS.
 MODULE_PATH="/home/robot/jmod:/usr/lib/elj/jmod"

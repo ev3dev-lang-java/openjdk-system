@@ -1,3 +1,13 @@
-APPCDS_DIR="/home/robot/appcds"
-CDS_MODE=cds
-APP_ID=app
+###
+# ev3dev-lang-java configuration
+
+## Cache-related flags
+
+# Path to AppCDS cache directory
+APPCDS_DIR="/home/robot/cache"
+
+# CDS mode. Can be: none, cds, appcds.
+CACHE_MODE=cds
+
+# Application ID for AppCDS cache name.
+APPCDS_NAME=app

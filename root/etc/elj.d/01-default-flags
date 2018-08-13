@@ -1,2 +1,10 @@
+###
+# ev3dev-lang-java configuration
+
+## JVM-related flags
+
+# Path to Java executable
 JAVA_EXE="/usr/bin/java"
+
+# Global JVM flags
 JAVA_FLAGS=""
