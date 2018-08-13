@@ -1,0 +1,67 @@
+.TH "ELJ.D" "5" "2018-08-13" "ev3dev-lang-java" "Configuration files"
+.SH NAME
+/etc/elj.d \- ev3dev-lang-java integration configuration directory
+.SH SYNOPSIS
+.B /etc/elj.d/01-default-flags
+.br
+.B /etc/elj.d/02-appcds
+.br
+.B /etc/elj.d/03-default-libs
+.br
+.B /etc/elj.d/*
+.SH DESCRIPTION
+.PP
+This directory contains system configuration for
+.BR elj-run (1).
+Several variables can be configured:
+.TP
+.BI JAVA_EXE= """/usr/bin/java"""
+Path to system Java executable.
+.TP
+.BI JAVA_FLAGS= """\-Xint"""
+Java options common for all invocations.
+.TP
+.BI APPCDS_DIR= """/home/user/.cache"""
+Default AppCDS cache storage.
+.TP
+.BI CACHE_MODE= """none"""
+Select java class caching mode. Available modes are:
+.BR none ", " cds ", " appcds "."
+For more info, see Java documentation and
+.BR elj-run (1)
+manpage.
+.TP
+.BI CLASS_PATH= """/path/to/lib1:/path/to/lib2"""
+Set the common java class path. To append this path, use this macro:
+.PP
+.RS
+.B CLASS_PATH="$(append_path """$CLASS_PATH""" """/path/to/lib3""")"
+.RE
+.TP
+.BI MODULE_PATH= """/path/to/mod1:/path/to/mod2"""
+Set the common java module path. To append this path, use this macro:
+.PP
+.RS
+.B MODULE_PATH="$(append_path """$MODULE_PATH""" """/path/to/mod3""")"
+.RE
+.PP
+For prepending the paths, you can use the \fBprepend_path\fR macro.
+.SH REPORTING BUGS
+.PP
+Please report bugs to GitHub:
+.UR https://github.com/ev3dev-lang-java/openjdk-system/issues
+.UE
+\[char46]
+.PP
+If not sure, report a bug in the main project:
+.UR https://github.com/ev3dev-lang-java/ev3dev-lang-java/issues/
+.UE
+\[char46]
+.SH COPYRIGHT
+.PP
+Copyright \[co] 2018 Jakub Vaněk. License: MIT license
+.UR https://opensource.org/licenses/MIT
+.UE
+\[char46]
+.SH SEE ALSO
+.BR elj-run "(1), " elj-shjar "(1), " java "(1)"
