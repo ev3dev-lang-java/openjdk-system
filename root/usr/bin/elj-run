@@ -6,22 +6,40 @@ for f in /etc/elj.d/*; do source $f; done
 # FUNCTIONS #
 #############
 
+# prepend *path
+function prepend_path() {
+    if [ -z "$1" ]; then
+        echo "$2"
+    else
+        echo "$1:$2"
+    fi
+}
+
+# append *path
+function append_path() {
+    if [ -z "$1" ]; then
+        echo "$2"
+    else
+        echo "$1:$2"
+    fi
+}
+
 # Dump AppCDS class list
 function appcds_app_lst() {
     echo -n " -Xshare:on"
-    echo -n " -XX:DumpLoadedClassList=${APPCDS_DIR}/${APP_ID}.lst"
+    echo -n " -XX:DumpLoadedClassList=${APPCDS_DIR}/${APPCDS_NAME}.lst"
 }
 
 # Dump AppCDS data
 function appcds_app_jsa() {
     echo -n " -Xshare:dump"
-    echo -n " -XX:SharedClassListFile=${APPCDS_DIR}/${APP_ID}.lst"
-    echo -n " -XX:SharedArchiveFile=${APPCDS_DIR}/${APP_ID}.jsa"
+    echo -n " -XX:SharedClassListFile=${APPCDS_DIR}/${APPCDS_NAME}.lst"
+    echo -n " -XX:SharedArchiveFile=${APPCDS_DIR}/${APPCDS_NAME}.jsa"
 }
 
 # flush AppCDS cache
 function appcds_delete() {
-    rm -f "${APPCDS_DIR}/${APP_ID}.lst" "${APPCDS_DIR}/${APP_ID}.jsa"
+    rm -f "${APPCDS_DIR}/${APPCDS_NAME}.lst" "${APPCDS_DIR}/${APPCDS_NAME}.jsa"
 }
 
 # CDS flag switch
@@ -32,14 +50,14 @@ function run_cds_flags() {
         echo -n " -Xshare:on"
     elif [ "$CACHE_MODE" == "appcds" ]; then
         echo -n " -Xshare:on"
-        echo -n " -XX:SharedArchiveFile=${APPCDS_DIR}/${APP_ID}.jsa"
+        echo -n " -XX:SharedArchiveFile=${APPCDS_DIR}/${APPCDS_NAME}.jsa"
     fi
 }
 
 # Check if AppCDS is OK
 function appcds_verify() {
     if [ "$CACHE_MODE" == "appcds" ]; then
-        if [ -f "${APPCDS_DIR}/${APP_ID}.lst" ] && [ -f "${APPCDS_DIR}/${APP_ID}.jsa" ]; then
+        if [ -f "${APPCDS_DIR}/${APPCDS_NAME}.lst" ] && [ -f "${APPCDS_DIR}/${APPCDS_NAME}.jsa" ]; then
             return 0
         else
             return 1
@@ -73,12 +91,12 @@ function printhelp() {
 function process_program_mode() {
     if [ ! -z "$MOD_NAME" ]; then
         if [ ! -z "$JAR_FILE" ]; then
-            MODULE_PATH="$MODULE_PATH:$JAR_FILE"
+            MODULE_PATH="$(append_path "$MODULE_PATH" "$JAR_FILE")"
         fi
         PRGSPEC="-m $MOD_NAME"
     else
         if [ ! -z "$JAR_FILE" ]; then
-            CLASS_PATH="$CLASS_PATH:$JAR_FILE"
+            CLASS_PATH="$(append_path "$CLASS_PATH" "$JAR_FILE")"
             PRGSPEC="-jar $JAR_FILE"
         else
             PRGSPEC=""
@@ -99,7 +117,7 @@ function appcds_dump_run() {
 
 # run application normally
 function normal_run() {
-    exec "$JAVA_EXE" -cp "$CLASS_PATH" -p "$MODULE_PATH" $JAVA_FLAGS "$(run_cds_flags)" $PRGSPEC "$@"
+    exec "$JAVA_EXE" -cp "$CLASS_PATH" -p "$MODULE_PATH" $JAVA_FLAGS $(run_cds_flags) $PRGSPEC "$@"
 }
 
 #################
@@ -151,10 +169,10 @@ while true ; do
         JAVA_FLAGS="$JAVA_FLAGS $2"
         shift 2 ;;
     --extra-class-path)
-        CLASS_PATH="$2:$CLASS_PATH"
+        CLASS_PATH="$(prepend_path "$CLASS_PATH" "$2")"
         shift 2 ;;
     --extra-module-path)
-        MODULE_PATH="$2:$MODULE_PATH"
+        MODULE_PATH="$(prepend_path "$MODULE_PATH" "$2")"
         shift 2 ;;
     --cache-mode)
         case "$2" in
@@ -184,10 +202,11 @@ done
 ##############
 
 if [ -z "$APPCDS_NAME" ]; then
-    # https://stackoverflow.com/a/965072
-    filename=$(basename -- "$JAR_FILE")
-    filename="${filename%.*}"
-    APPCDS_NAME="$filename"
+    # https://stackoverflow.com/a/36866015
+    name="$(readlink -f "$JAR_FILE")"
+    name="$(basename -- $name)"
+    name="$(echo "$name" | sed -e 's/\.[^.]*$//')"
+    APPCDS_NAME="$name"
 fi
 
 if [ "$APPCDS_FLUSH" == "yes" ]; then

@@ -65,7 +65,7 @@ while true ; do
         exit 0
         ;;
     --java-exe|--extra-jvm-flags|--extra-class-path|--extra-module-path|--cache-mode|--appcds-name|--appcds-dir|--mod)
-        ELJ_ARGS="$ELJ_ARGS $1 \"$2\""
+        ELJ_ARGS="$ELJ_ARGS $1 $2"
         shift 2 ;;
     --extra-program-args)
         ELJ_PROGRAM_ARGS="$2"
@@ -100,3 +100,6 @@ sed -e     "s/%ELJ_ARGS%/$ELJ_ARGS_ESCAPE/g"     \
     /usr/share/elj/stub.sh > "$TMPFILE"
 cat "$TMPFILE" "$SOURCE_FILE" > "$DESTINATION_FILE"
 rm "$TMPFILE"
+
+elj-run $ELJ_ARGS --appcds-flush --program "$DESTINATION_FILE"
+chmod +x "$DESTINATION_FILE"
