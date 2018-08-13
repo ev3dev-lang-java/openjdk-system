@@ -1,5 +1,12 @@
 #!/bin/bash
 
+# unset "funny" environment variables
+unset JAR_FILE
+unset MOD_NAME
+unset APPCDS_NAME
+unset APPCDS_FLUSH
+
+# load system config
 for f in /etc/elj.d/*; do source $f; done
 
 #############
