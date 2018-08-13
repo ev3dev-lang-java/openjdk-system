@@ -8,6 +8,3 @@ APPCDS_DIR="/home/robot/cache"
 
 # CDS mode. Can be: none, cds, appcds.
 CACHE_MODE=cds
-
-# Application ID for AppCDS cache name.
-APPCDS_NAME=app
