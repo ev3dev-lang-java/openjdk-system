@@ -10,7 +10,7 @@ Vcs-Browser: https://github.com/ev3dev-lang-java/openjdk-system
 
 Package: elj-base
 Architecture: all
-Depends: java-common, default-jre (>= 9) | java-runtime-headless (>= 9), bash (>= 4.4), ${misc:Depends}
+Depends: java-common, bash (>= 4.4), ${misc:Depends}
 Description: ev3dev system integration for ev3dev-lang-java
  This package provides basic integration of ev3dev-lang-java
  with debian and ev3dev menu.
