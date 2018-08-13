@@ -1,36 +1,55 @@
 #!/bin/bash
 
+function sed_escape() {
+    sed 's/[&/\]/\\&/g' <<<"$1"
+}
+
 # print help message
 function printhelp() {
     echo "elj-shjar -- Create executable JARs for EV3DEV" >&2
     echo "Usage:" >&2
-    echo "  elj-shjar --help" >&2
-    echo "  elj-shjar <flags>" >&2
+    echo "  elj-shjar --program <path> --output <path> <flags>" >&2
     echo "Flags: " >&2
     echo "  --help                         Shows this help message." >&2
-    echo "  --app-id <id>                  Set application id for appcds caching." >&2
+    echo "  --program <path>               Path to the program JAR." >&2
+    echo "  --output <path>                Output file." >&2
+    echo "  --mod <path>                   Name of program module. If set, java module mode is used." >&2
     echo "  --java-exe <path>              Override the java executable to use." >&2
-    echo "  --cds-mode <mode>              Set the CDS mode. Possible options are: none, cds, appcds" >&2
-    echo "  --appcds-dir <path>            Override AppCDS cache base directory." >&2
     echo "  --extra-jvm-flags '<flags>'    Append flags to java invocation." >&2
     echo "  --extra-class-path '<paths>'   Prepend classpath with additional paths." >&2
     echo "  --extra-module-path '<paths>'  Prepend modulepath with additional paths." >&2
     echo "  --extra-program-args '<args>'  Prepend commandline arguments with additional ones." >&2
-    echo "  --program <path>               Path to program JAR or module." >&2
-    echo "  --mod <path>                   Name of program module. If set, sets mode to JMOD." >&2
-    echo "  --output <path>                Output file." >&2
+    echo "Caching flags:" >&2
+    echo "  --cache-mode <mode>            Set the CDS mode. Possible options are: none, cds, appcds" >&2
+    echo "  --appcds-name <id>             Set AppCDS cache name." >&2
+    echo "  --appcds-dir <path>            Override AppCDS cache base directory." >&2
 }
 
 #################
 # INPUT PARSING #
 #################
 
+ARGUMENT_LIST=(
+    "help"
+    "program:"
+    "output:"
+    "mod:"
+    "java-exe:"
+    "extra-jvm-flags:"
+    "extra-class-path:"
+    "extra-module-path:"
+    "extra-program-args:"
+    "cache-mode:"
+    "appcds-name:"
+    "appcds-dir:"
+)
+
 if [ "$#" -eq 0 ]; then
     printhelp
     exit 1
 fi
 
-OPTSTR="$(getopt -o "" -l "help,dump,app-id:,java-exe:,extra-jvm-flags:,cds-mode:,appcds-dir:,extra-class-path:,extra-module-path:,extra-program-args:,program:,mod:,output:" -n 'elj-run' -- "$@")"
+OPTSTR="$(getopt -o "" -l "$(printf "%s," "${ARGUMENT_LIST[@]}")" -n 'elj-run' -- "$@")"
 OPTRET="$?"
 if [ "$OPTRET" -ne 0 ]; then
   exit 1
@@ -45,7 +64,7 @@ while true ; do
         printhelp
         exit 0
         ;;
-    --app-id|--java-exe|--extra-jvm-flags|--cds-mode|--appcds-dir|--extra-class-path|--extra-module-path)
+    --java-exe|--extra-jvm-flags|--extra-class-path|--extra-module-path|--cache-mode|--appcds-name|--appcds-dir|--mod)
         ELJ_ARGS="$ELJ_ARGS $1 \"$2\""
         shift 2 ;;
     --extra-program-args)
@@ -53,9 +72,6 @@ while true ; do
         shift 2 ;;
     --program)
         SOURCE_FILE="$2"
-        shift 2 ;;
-    --mod)
-        MOD_SPEC="--mod $2"
         shift 2 ;;
     --output)
         DESTINATION_FILE="$2"
@@ -75,13 +91,11 @@ fi
 
 # https://stackoverflow.com/a/29613573
 
-ELJ_ARGS_ESCAPE=$(sed 's/[&/\]/\\&/g' <<<"$ELJ_ARGS")
-MOD_SPEC_ESCAPE=$(sed 's/[&/\]/\\&/g' <<<"$MOD_SPEC")
-ELJ_POSTARGS_ESCAPE=$(sed 's/[&/\]/\\&/g' <<<"$ELJ_POSTARGS")
+ELJ_ARGS_ESCAPE=$(sed_escape "$ELJ_ARGS")
+ELJ_POSTARGS_ESCAPE=$(sed_escape "$ELJ_POSTARGS")
 
 TMPFILE="$(mktemp /tmp/wrapper.XXXXXXXX)"
 sed -e     "s/%ELJ_ARGS%/$ELJ_ARGS_ESCAPE/g"     \
-    -e     "s/%MOD_SPEC%/$MOD_SPEC_ESCAPE/g"     \
     -e "s/%ELJ_POSTARGS%/$ELJ_POSTARGS_ESCAPE/g" \
     /usr/share/elj/stub.sh > "$TMPFILE"
 cat "$TMPFILE" "$SOURCE_FILE" > "$DESTINATION_FILE"

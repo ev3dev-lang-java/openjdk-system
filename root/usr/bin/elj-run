@@ -7,95 +7,99 @@ for f in /etc/elj.d/*; do source $f; done
 #############
 
 # Dump AppCDS class list
-function appcds_dump_classes_flags() {
-    echo -n " -XX:+UnlockDiagnosticVMOptions"
-    echo -n " -XX:+UseAppCDS"
+function appcds_app_lst() {
+    echo -n " -Xshare:on"
     echo -n " -XX:DumpLoadedClassList=${APPCDS_DIR}/${APP_ID}.lst"
 }
 
 # Dump AppCDS data
-function appcds_dump_cache_flags() {
-    echo -n " -XX:+UnlockDiagnosticVMOptions"
-    echo -n " -XX:+UseAppCDS"
+function appcds_app_jsa() {
     echo -n " -Xshare:dump"
     echo -n " -XX:SharedClassListFile=${APPCDS_DIR}/${APP_ID}.lst"
     echo -n " -XX:SharedArchiveFile=${APPCDS_DIR}/${APP_ID}.jsa"
 }
 
-# Use AppCDS data
-function appcds_run_flags() {
-    echo -n " -XX:+UnlockDiagnosticVMOptions"
-    echo -n " -XX:+UseAppCDS"
-    echo -n " -Xshare:on"
-    echo -n " -XX:SharedArchiveFile=${APPCDS_DIR}/${APP_ID}.jsa"
-}
-
-# Dump CDS data
-function do_cds_dump() {
-    java -XX:+UnlockDiagnosticVMOptions -Xshare:dump -XX:SharedArchiveFile=${APPCDS_DIR}/cds.jsa
-    return $?
-}
-
-# Use CDS data
-function cds_run_flags() {
-    echo -n " -XX:+UnlockDiagnosticVMOptions"
-    echo -n " -XX:-UseAppCDS"
-    echo -n " -Xshare:on"
-    echo -n " -XX:SharedArchiveFile=${APPCDS_DIR}/cds.jsa"
-}
-
-# Do not use any CDS
-function no_cds_run_flags() {
-    echo -n " -XX:+UnlockDiagnosticVMOptions"
-    echo -n " -XX:-UseAppCDS"
-    echo -n " -Xshare:off"
+# flush AppCDS cache
+function appcds_delete() {
+    rm -f "${APPCDS_DIR}/${APP_ID}.lst" "${APPCDS_DIR}/${APP_ID}.jsa"
 }
 
 # CDS flag switch
-function get_cds_flags() {
-    if [ "$CDS_MODE" == "none" ]; then
-        echo -n "$(no_cds_run_flags)"
-    elif [ "$CDS_MODE" == "cds" ]; then
-        echo -n "$(cds_run_flags)"
-    elif [ "$CDS_MODE" == "appcds" ]; then
-        echo -n "$(appcds_run_flags)"
-    else
-        echo "Unknown CDS mode: $CDS_MODE" >&2
-        exit 1
+function run_cds_flags() {
+    if [ "$CACHE_MODE" == "none" ]; then
+        echo -n " -Xshare:off"
+    elif [ "$CACHE_MODE" == "cds" ]; then
+        echo -n " -Xshare:on"
+    elif [ "$CACHE_MODE" == "appcds" ]; then
+        echo -n " -Xshare:on"
+        echo -n " -XX:SharedArchiveFile=${APPCDS_DIR}/${APP_ID}.jsa"
     fi
 }
 
-# get jar/module flags
-function get_program_specifier() {
-    if [ "$JAR_FILE" ]; then
-        echo -n "-jar $JAR_FILE"
-    elif [ "$MOD_FILE" ]; then
-        echo -n "-m $MOD_FILE"
+# Check if AppCDS is OK
+function appcds_verify() {
+    if [ "$CACHE_MODE" == "appcds" ]; then
+        if [ -f "${APPCDS_DIR}/${APP_ID}.lst" ] && [ -f "${APPCDS_DIR}/${APP_ID}.jsa" ]; then
+            return 0
+        else
+            return 1
+        fi
     else
-        # user has to provide class in additional args
-        echo -n ""
+        return 0
     fi
 }
 
 # print help message
 function printhelp() {
-    echo "elj-run -- Run Java programs on EV3DEV" >&2
+    echo "elj-run -- run java programs with ev3dev-lang-java" >&2
     echo "Usage:" >&2
-    echo "  elj-run --help" >&2
-    echo "  elj-run <flags> --dump -- <program args>" >&2
-    echo "  elj-run <flags>        -- <program args>" >&2
-    echo "Flags: " >&2
+    echo "  elj-run <flags> -- <program args>" >&2
+    echo "General flags:" >&2
     echo "  --help                         Shows this help message." >&2
-    echo "  --dump                         Dump AppCDS/CDS cache." >&2
-    echo "  --app-id <id>                  Set application id for appcds caching." >&2
+    echo "  --program <path>               Path to the program JAR." >&2
+    echo "  --mod <path>                   Name of program module. If set, java module mode is used." >&2
     echo "  --java-exe <path>              Override the java executable to use." >&2
-    echo "  --cds-mode <mode>              Set the CDS mode. Possible options are: none, cds, appcds" >&2
-    echo "  --appcds-dir <path>            Override AppCDS cache base directory." >&2
     echo "  --extra-jvm-flags '<flags>'    Append flags to java invocation." >&2
     echo "  --extra-class-path '<paths>'   Prepend classpath with additional paths." >&2
     echo "  --extra-module-path '<paths>'  Prepend modulepath with additional paths." >&2
-    echo "  --program <path>               Path to program JAR. Only used when --mod is not used." >&2
-    echo "  --mod <path>                   Name of program module. If set, sets mode to JMOD" >&2
+    echo "Caching flags:" >&2
+    echo "  --cache-mode <mode>            Set the CDS mode. Possible options are: none, cds, appcds" >&2
+    echo "  --appcds-name <id>             Set AppCDS cache name." >&2
+    echo "  --appcds-dir <path>            Override AppCDS cache base directory." >&2
+    echo "  --appcds-flush                 Clean AppCDS cache and exit." >&2
+}
+
+# process jar/module flags and adjust classpath/modulepath/"program specifier"
+function process_program_mode() {
+    if [ ! -z "$MOD_NAME" ]; then
+        if [ ! -z "$JAR_FILE" ]; then
+            MODULE_PATH="$MODULE_PATH:$JAR_FILE"
+        fi
+        PRGSPEC="-m $MOD_NAME"
+    else
+        if [ ! -z "$JAR_FILE" ]; then
+            CLASS_PATH="$CLASS_PATH:$JAR_FILE"
+            PRGSPEC="-jar $JAR_FILE"
+        else
+            PRGSPEC=""
+        fi
+    fi
+}
+
+# run application while dumping appcds cache
+function appcds_dump_run() {
+    mkdir -p "${APPCDS_DIR}"
+
+    echo "Generating loaded class list."
+    "$JAVA_EXE" -cp "$CLASS_PATH" -p "$MODULE_PATH" $JAVA_FLAGS $(appcds_app_lst) $PRGSPEC "$@"
+
+    echo "Dumping AppCDS data."
+    "$JAVA_EXE" -cp "$CLASS_PATH" -p "$MODULE_PATH" $JAVA_FLAGS $(appcds_app_jsa)
+}
+
+# run application normally
+function normal_run() {
+    exec "$JAVA_EXE" -cp "$CLASS_PATH" -p "$MODULE_PATH" $JAVA_FLAGS "$(run_cds_flags)" $PRGSPEC "$@"
 }
 
 #################
@@ -107,7 +111,21 @@ if [ "$#" -eq 0 ]; then
     exit 1
 fi
 
-OPTSTR="$(getopt -o "" -l "help,dump,app-id:,java-exe:,extra-jvm-flags:,cds-mode:,appcds-dir:,extra-class-path:,extra-module-path:,program:,mod:" -n 'elj-run' -- "$@")"
+ARGUMENT_LIST=(
+    "help"
+    "program:"
+    "mod:"
+    "java-exe:"
+    "extra-jvm-flags:"
+    "extra-class-path:"
+    "extra-module-path:"
+    "cache-mode:"
+    "appcds-name:"
+    "appcds-dir:"
+    "appcds-flush"
+)
+
+OPTSTR="$(getopt -o "" -l "$(printf "%s," "${ARGUMENT_LIST[@]}")" -n 'elj-run' -- "$@")"
 OPTRET="$?"
 if [ "$OPTRET" -ne 0 ]; then
   exit 1
@@ -120,11 +138,11 @@ while true ; do
         printhelp
         exit 0
         ;;
-    --dump)
-        CDS_DUMP=1
-        shift ;;
-    --app-id)
-        APP_ID="$2"
+    --program)
+        JAR_FILE="$2"
+        shift 2 ;;
+    --mod)
+        MOD_NAME="$2"
         shift 2 ;;
     --java-exe)
         JAVA_EXE="$2"
@@ -132,72 +150,58 @@ while true ; do
     --extra-jvm-flags)
         JAVA_FLAGS="$JAVA_FLAGS $2"
         shift 2 ;;
-    --cds-mode)
-        case "$2" in
-        none|cds|appcds)
-            CDS_MODE="$2";;
-        *)
-            echo "Error: invalid CDS mode." >&2
-            exit 1
-        esac
-        shift 2 ;;
-    --appcds-dir)
-        APPCDS_DIR="$2"
-        shift 2 ;;
     --extra-class-path)
         CLASS_PATH="$2:$CLASS_PATH"
         shift 2 ;;
     --extra-module-path)
         MODULE_PATH="$2:$MODULE_PATH"
         shift 2 ;;
-    --program)
-        JAR_FILE="$2"
+    --cache-mode)
+        case "$2" in
+        none|cds|appcds)
+            CACHE_MODE="$2";;
+        *)
+            echo "Error: invalid CDS mode." >&2
+            exit 1
+        esac
         shift 2 ;;
-    --mod)
-        MOD_FILE="$2"
+    --appcds-name)
+        APPCDS_NAME="$2"
         shift 2 ;;
+    --appcds-dir)
+        APPCDS_DIR="$2"
+        shift 2 ;;
+    --appcds-flush)
+        APPCDS_FLUSH=yes
+        shift ;;
     --) shift; break ;;
     *) echo "Internal error!" ; exit 1 ;;
     esac
 done
 
-
 ##############
 # MAIN LOGIC #
 ##############
 
-if [ ! -z "$MOD_FILE" ]; then
-    unset JAR_FILE
+if [ -z "$APPCDS_NAME" ]; then
+    # https://stackoverflow.com/a/965072
+    filename=$(basename -- "$JAR_FILE")
+    filename="${filename%.*}"
+    APPCDS_NAME="$filename"
 fi
 
-if [ "$CDS_DUMP" == "1" ]; then
-    mkdir -p "${APPCDS_DIR}"
-    if [ "$CDS_MODE" == "none" ]; then
-        echo "Nothing to dump."
-        exit 0
+if [ "$APPCDS_FLUSH" == "yes" ]; then
+    appcds_delete
+    exit 0
+fi
 
-    elif [ "$CDS_MODE" == "cds" ]; then
-        echo "Dumping CDS data."
-        do_cds_dump
-        exit $?
-
-    elif [ "$CDS_MODE" == "appcds" ]; then
-        echo "Dumping AppCDS class list."
-
-        PRGSPEC="$(get_program_specifier)"
-        "$JAVA_EXE" -cp "$CLASS_PATH" -p "$MODULE_PATH" $JAVA_FLAGS $(appcds_dump_classes_flags) $PRGSPEC "$@"
-
-        echo "Dumping AppCDS data."
-        "$JAVA_EXE" -cp "$CLASS_PATH" -p "$MODULE_PATH" $JAVA_FLAGS $(appcds_dump_cache_flags)
-        exit $?
+process_program_mode
+if [ "$CACHE_MODE" == "appcds" ]; then
+    if appcds_verify; then
+        normal_run
     else
-        echo "Unknown CDS mode: $CDS_MODE" >&2
-        exit 1
+        appcds_dump_run
     fi
 else
-    # cds flags
-    CDS_FLAGS="$(get_cds_flags)"
-    PRGSPEC="$(get_program_specifier)"
-
-    exec "$JAVA_EXE" -cp "$CLASS_PATH" -p "$MODULE_PATH" $JAVA_FLAGS $CDS_FLAGS $PRGSPEC "$@"
+    normal_run
 fi

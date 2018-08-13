@@ -14,12 +14,12 @@ if [ ! -z "$ELJ_EXTRACT" ]; then
     extract >"$ELJ_EXTRACT"
     exit 0
 else
-    DUMP_ARG=""
-    if [ ! -z "$ELJ_DUMP" ]; then
-        DUMP_ARG="--dump"
+    if [ ! -z "$ELJ_FLUSH" ] || [ -f "$SELF.flush" ]; then
+        rm -f "$SELF.flush"
+        elj-run %ELJ_ARGS% --appcds-flush --program "$SELF" -- %ELJ_POSTARGS% "$@"
     fi
-    exec elj-run %ELJ_ARGS% $DUMP_ARG --program "$SELF" %MOD_SPEC% -- %ELJ_POSTARGS% "$@"
+    exec elj-run %ELJ_ARGS% --program "$SELF" -- %ELJ_POSTARGS% "$@"
 fi
 
-exit 0
+exit 1
 SCRIPT_END_HERE
