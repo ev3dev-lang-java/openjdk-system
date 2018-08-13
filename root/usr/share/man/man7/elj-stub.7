@@ -1,0 +1,95 @@
+.TH "ELJ-STUB" "7" "2018-08-13" "ev3dev-lang-java" "Miscellaneous Information Manual"
+.SH NAME
+stub.sh \- jar wrapper for ev3dev-lang-java
+.SH SYNOPSIS
+.B stub.sh
+[\fIJAR OPTIONS\fR ...]
+.SH DESCRIPTION
+.PP
+.B stub.sh
+is a small shell script template that is preprocessed by
+.BR elj-shjar (1)
+and then a JAR file is appended to it.
+This script provides minimal interface for running and extracting
+its payload and flushing the AppCDS cache.
+
+.SH OPTIONS
+.PP
+All options are passed as JAR arguments to the
+.BR elj-run (1)
+program.
+.SH ENVIRONMENT
+.TP
+.B ELJ_EXTRACT
+If this variable is set, the appended JAR is extracted to the file path
+contained in the variable.
+.TP
+.B ELJ_FLUSH
+If this variable is set, AppCDS cache is flushed before running
+the program.
+Unlike with \fBelj-run\fR, setting this variable does not stop it from running the payload.
+.SH FILES
+.TP
+\fI/path/to/file.sh\fB.flush\fR
+If a file with the script name and an extra \fB.flush\fR suffix is found,
+AppCDS cache will be refreshed and the \fB.flush\fR file will be deleted.
+.SH EXIT STATUS
+.IP 0
+if OK.
+.IP "not 0"
+if something failed.
+.PP
+.SH EXAMPLE
+.PP
+To simply run the wrapped program:
+.PP
+.nf
+.RS
+$ \fB./program.sh arg1 arg2\fR
+.RE
+.fi
+.PP
+To flush the AppCDS cache:
+.PP
+.nf
+.RS
+$ \fBtouch ./program.sh.flush\fR
+$ \fB./program.sh arg1 arg2\fR
+.RE
+.fi
+.PP
+- or -
+.PP
+.nf
+.RS
+$ \fBEFJ_FLUSH=1 ./program.sh arg1 arg2\fR
+.RE
+.fi
+.PP
+To extract the payload:
+.PP
+.nf
+.RS
+$ \fBELJ_EXTRACT=./program.jar ./program.sh\fR
+.RE
+.fi
+.PP
+.SH REPORTING BUGS
+.PP
+Please report bugs to GitHub:
+.UR https://github.com/ev3dev-lang-java/openjdk-system/issues
+.UE
+\[char46]
+.PP
+If not sure, report a bug in the main project:
+.UR https://github.com/ev3dev-lang-java/ev3dev-lang-java/issues/
+.UE
+\[char46]
+.SH COPYRIGHT
+.PP
+Copyright \[co] 2018 Jakub Vaněk. License: MIT license
+.UR https://opensource.org/licenses/MIT
+.UE
+\[char46]
+.SH SEE ALSO
+.BR elj-jar "(1), " elj-shjar "(1), " elj.d "(5), " java "(1)"
