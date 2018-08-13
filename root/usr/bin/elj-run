@@ -202,11 +202,15 @@ done
 ##############
 
 if [ -z "$APPCDS_NAME" ]; then
-    # https://stackoverflow.com/a/36866015
-    name="$(readlink -f "$JAR_FILE")"
-    name="$(basename -- $name)"
-    name="$(echo "$name" | sed -e 's/\.[^.]*$//')"
-    APPCDS_NAME="$name"
+    if [ -z "$JAR_NAME" ]; then
+        APPCDS_NAME="unnamed"
+    else
+        # https://stackoverflow.com/a/36866015
+        name="$(readlink -f "$JAR_FILE")"
+        name="$(basename -- $name)"
+        name="$(echo "$name" | sed -e 's/\.[^.]*$//')"
+        APPCDS_NAME="$name"
+    fi
 fi
 
 if [ "$APPCDS_FLUSH" == "yes" ]; then
