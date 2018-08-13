@@ -1,0 +1,106 @@
+.TH "ELJ-SHJAR" "1" "2018-08-13" "ev3dev-lang-java" "User Commands"
+.SH NAME
+elj-shjar \- create executable wrapper for a jar file
+.SH SYNOPSIS
+.B elj-run
+[\fB\-\-help\fR]
+[\fB\-\-program\fR \fIjar\fR]
+[\fB\-\-output\fR \fIsh\fR]
+[\fB\-\-extra\-program\-args\fR \fIargs\fR]
+[\fIMORE ELJ-RUN OPTIONS\fR ...]
+.SH DESCRIPTION
+.PP
+.B elj-shjar
+is an utility for wrapping JARs with small shell script wrapper.
+When this wrapped program is executed, the wrapper runs
+.BR elj-run (1)
+on itself with flags saved in this very script. The configuration is
+embedded in from
+-B elj-shjar
+command line parameters.
+.PP
+The wrapper is documented under
+.BR elj-stub (7)
+manual entry.
+.SH OPTIONS
+.SS General options
+.TP
+.B \-\-help
+Show a quick summary of program options.
+.TP
+.BI "\-\-program "  jar
+Set the source JAR file. Also add it to the stored parameters.
+.TP
+.BI "\-\-output "  sh
+Set the destination file.
+.TP
+.BI "\-\-extra\-program\-args " "arg1 arg2 ..."
+Prepend the actual program arguments with the specified ones.
+.SS elj-run options
+.PP
+Many more options are available. They are passed to the
+.BR elj-run (1)
+utility.
+Their description is available on that man page.
+.SH EXIT STATUS
+.IP 0
+if OK.
+.IP 1
+if invalid input was passed in.
+.SH BUGS
+.B elj-shjar
+does not support wrapping JAR-less programs (with main class found on
+classpath).
+This is because the wrapper script always passes its location to
+\fBelj-run\fR as the JAR path.
+.SH EXAMPLE
+.PP
+To simply wrap a jar program with default parameters:
+.PP
+.nf
+.RS
+$ \fBelj-shjar --program /path/to/program.jar \\
+    --output /path/to/program.sh\fR
+.RE
+.fi
+.PP
+To wrap a modular jar:
+.PP
+.nf
+.RS
+$ \fBelj-shjar --program /path/to/org.example.program.jar \\
+    --mod org.example.program \\
+    --output /path/to/program.sh\fR
+.RE
+.fi
+.PP
+To use AppCDS to run a program:
+.PP
+.nf
+.RS
+$ \fBelj-shjar --program /path/to/program.jar \\
+    --cache-mode appcds \\
+    --appcds-name program \\
+    --output /path/to/program.sh\fR
+.RE
+.fi
+.PP
+.SH REPORTING BUGS
+.PP
+Please report bugs to GitHub:
+.UR https://github.com/ev3dev-lang-java/openjdk-system/issues
+.UE
+\[char46]
+.PP
+If not sure, report a bug in the main project:
+.UR https://github.com/ev3dev-lang-java/ev3dev-lang-java/issues/
+.UE
+\[char46]
+.SH COPYRIGHT
+.PP
+Copyright \[co] 2018 Jakub Vaněk. License: MIT license
+.UR https://opensource.org/licenses/MIT
+.UE
+\[char46]
+.SH SEE ALSO
+.BR elj-jar "(1), " elj-stub "(7), " elj.d "(5), " java "(1), "
