@@ -1,0 +1,6 @@
+# Compulsory line, this is a version 3 file
+version=3
+
+# Examines GitHub tags page
+https://github.com/ev3dev-lang-java/openjdk-system/tags .*/(\d[\d\.]+)\.tar\.gz
+

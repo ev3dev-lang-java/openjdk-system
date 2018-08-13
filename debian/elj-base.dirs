@@ -1,0 +1,15 @@
+usr
+usr/bin
+usr/lib
+usr/lib/elj
+usr/lib/elj/jar
+usr/lib/elj/jmod
+usr/lib/jvm
+usr/share
+usr/share/elj
+usr/share/man
+usr/share/man/man1
+usr/share/man/man5
+usr/share/man/man7
+etc
+etc/elj.d

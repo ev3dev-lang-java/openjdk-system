@@ -1,0 +1,19 @@
+#!/usr/bin/make -f
+#export DH_VERBOSE = 1
+
+DESTDIR = debian/elj-base
+
+%:
+	dh $@
+
+override_dh_auto_install:
+	install -p -m 644 root/etc/elj.d/* $(DESTDIR)/etc/elj.d
+	install -p -m 755 root/usr/bin/* $(DESTDIR)/usr/bin
+	install -p -m 755 root/usr/share/elj/* $(DESTDIR)/usr/share/elj
+	install -p -m 644 root/usr/share/man/man7/* $(DESTDIR)/usr/share/man/man7
+	install -p -m 644 root/usr/share/man/man1/* $(DESTDIR)/usr/share/man/man1
+	install -p -m 644 root/usr/share/man/man5/* $(DESTDIR)/usr/share/man/man5
+	install -p -m 644 root/usr/share/man/man7/* $(DESTDIR)/usr/share/man/man7
+	mkdir -p -m 755 $(DESTDIR)/usr/lib/jvm
+	mkdir -p -m 755 $(DESTDIR)/usr/lib/elj/jar
+	mkdir -p -m 755 $(DESTDIR)/usr/lib/elj/jmod
