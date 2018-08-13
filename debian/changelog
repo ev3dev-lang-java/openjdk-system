@@ -1,12 +1,19 @@
+elj-base (1.0.1-2) stretch; urgency=low
+
+  * Test signing
+
+ -- Jakub Vaněk (http://jakubvanekpc.jecool.net/) <linuxtardis@gmail.com>  Mon, 13 Aug 2018 23:37:57 +0200
+
+
 elj-base (1.0.1-1) stretch; urgency=low
 
   * Add build script
 
- -- Jakub Vaněk <linuxtardis@gmail.com>  Mon, 13 Aug 2018 23:18:17 +0200
+ -- Jakub Vaněk (http://jakubvanekpc.jecool.net/) <linuxtardis@gmail.com>  Mon, 13 Aug 2018 23:18:17 +0200
 
 
 elj-base (1.0.0-1) stretch; urgency=low
 
   * Initial release
 
- -- Jakub Vaněk <linuxtardis@gmail.com>  Mon, 13 Aug 2018 21:33:08 +0200
+ -- Jakub Vaněk (http://jakubvanekpc.jecool.net/) <linuxtardis@gmail.com>  Mon, 13 Aug 2018 21:33:08 +0200
