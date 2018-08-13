@@ -1,0 +1,170 @@
+.TH "ELJ-RUN" "1" "2018-08-13" "ev3dev-lang-java" "User Commands"
+.SH NAME
+elj-run \- run java program in ev3dev-lang-java environment
+.SH SYNOPSIS
+.B elj-run
+[\fB\-\-help\fR]
+[\fB\-\-program\fR \fIjar\fR]
+[\fB\-\-mod\fR \fImodname\fR]
+[\fB\-\-java\-exe\fR \fIpath\fR]
+[\fB\-\-extra\-jvm\-flags\fR \fIflags\fR]
+[\fB\-\-extra\-class\-path\fR \fIpaths\fR]
+[\fB\-\-extra\-module\-path\fR \fIpaths\fR]
+[\fB\-\-cache\-mode\fR \fImode\fR]
+[\fB\-\-appcds\-name\fR \fIname\fR]
+[\fB\-\-appcds\-dir\fR \fIdir\fR]
+[\fB\-\-appcds\-flush\fR]
+\fB\-\-\fR
+[\fIJAR OPTIONS\fR ...]
+.SH DESCRIPTION
+.PP
+.B elj-run
+is a main program for running plain java programs under ev3dev-lang-java.
+Given the right parameters, it wraps the \fBjava\fR command with
+appropriate flags.
+When some parameters are not specified, their values are taken from the
+system configuration.
+.PP
+First task this program is for is gluing together
+ev3dev-lang-java libraries and user programs.
+Library paths are loaded from system configuration and combined with
+user-provided additional library paths.
+.PP
+Second problem this program solves is managing Java class caches.
+EV3 is quite slow when starting Java, so this wrapper automatically turns
+on CDS caching.
+To achieve further speedup, AppCDS caching mode is available.
+It caches all classes loaded on the first program startup for
+future loads.
+.PP
+For information about Java options, CDS and AppCDS, please consult the
+Java documentation.
+.SH OPTIONS
+.SS General options
+.TP
+.B \-\-help
+Show a quick summary of program options.
+.TP
+.BI "\-\-program "  jar
+Add this JAR to classpath/modulepath (depending on \fB\-\-mod\fR option)
+and uses it for main class lookup if \fB\-\-mod\fR is not specified.
+.TP
+.BI "\-\-mod " module.name[/main.class]
+Use this module as the java run target.
+This activates java module mode and \fB\-\-program\fR argument is added
+to java module path.
+.TP
+.BI "\-\-java\-exe " path
+Use this java executable instead of the system default.
+.TP
+.BI "\-\-extra\-jvm\-flags " "'flag1 flag2 ...'"
+Append these flags to the java command line.
+This option can be specified only once, so it is necessary to specify
+multiple arguments in one string.
+.TP
+.BI "\-\-extra\-class\-path " "path1:path2:..."
+Prepend class path with following paths.
+The path list format is the same as Java uses, as it is forwarded to it.
+.TP
+.BI "\-\-extra\-module\-path " "path1:path2:... "
+Prepend module path with following paths.
+The path list format is the same as Java uses, as it is forwarded to it.
+.SS Caching options
+.TP
+.BI "\-\-cache\-mode " "mode"
+Select java class caching mode.
+Available choices are \fBnone\fR, \fBcds\fR, \fBappcds\fR.
+The default is defined in system configuration.
+.TP
+.BI "\-\-appcds\-name " "name"
+Set the AppCDS cache name.
+This needs to be unique to this program, else programs would end up
+sharing the same cache.
+If this option is not used, program JAR without the extension is used.
+If program JAR isn't known either, \fBapp\fR is used instead.
+.TP
+.BI "\-\-appcds\-dir" "dir"
+Set the AppCDS cache directory.
+This is the directory where loaded class lists and caches will be stored.
+.TP
+.B "\-\-appcds\-flush"
+Flush the AppCDS cache for this program.
+After that is done, no program is run.
+.SS JAR options
+.PP
+After the parameters to this wrapper, you can specify parameters to the
+program to be run.
+If there are any, they have to be separated by the double dash
+(\fB\-\-\fR) from the previous arguments.
+.SH EXIT STATUS
+.IP 0
+if OK.
+.IP "not 0"
+if something failed.
+.SH FILES
+.TP
+.B /etc/elj.d/*
+System configuration files. For more info, see
+.BR elj.d (5).
+.SH NOTES
+.PP
+This program does not manage the system Java versions. To do that, please
+use the
+.BR update-java-alternatives (8)
+utility.
+.SH BUGS
+.PP
+Some of the known are fixed. Do you know a new one? Please report it to us!
+.SH EXAMPLE
+.PP
+To simply run a jar program with default parameters and two arguments:
+.PP
+.nf
+.RS
+$ \fBelj-run --program /path/to/program.jar -- arg1 arg2\fR
+.RE
+.fi
+.PP
+To run a modular jar:
+.PP
+.nf
+.RS
+$ \fBelj-run --program /path/to/org.example.program.jar --mod org.example.program \fR
+.RE
+.fi
+.PP
+To use AppCDS to run a program:
+.PP
+.nf
+.RS
+$ \fBelj-run --program /path/to/program.jar --cache-mode appcds --appcds-name program\fR
+.RE
+.fi
+.PP
+To run a program just from the module path, not having a JAR:
+.PP
+.nf
+.RS
+$ \fBelj-run --extra-module-path /path/to/bin/dir:/path/to/lib/dir --mod org.example.program\fR
+.RE
+.fi
+.PP
+.SH REPORTING BUGS
+.PP
+Please report bugs to GitHub:
+.UR https://github.com/ev3dev-lang-java/openjdk-system/issues
+.UE
+\[char46]
+.PP
+If not sure, report a bug in the main project:
+.UR https://github.com/ev3dev-lang-java/ev3dev-lang-java/issues/
+.UE
+\[char46]
+.SH COPYRIGHT
+.PP
+Copyright \[co] 2018 Jakub Vaněk. License: MIT license
+.UR https://opensource.org/licenses/MIT
+.UE
+\[char46]
+.SH SEE ALSO
+.BR elj-shjar "(1), " elj.d "(5), " java "(1), " update-java-alternatives "(8)
