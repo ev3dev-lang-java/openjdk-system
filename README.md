@@ -33,9 +33,9 @@ Model
 /usr/lib/jvm/jdk3
   - system-managed Java versions
 
-/home/robot/appcds/${ID1}
-/home/robot/appcds/${ID2}
-/home/robot/appcds/${ID3}
+/home/robot/cache/${ID1}
+/home/robot/cache/${ID2}
+/home/robot/cache/${ID3}
   - AppCDS caches
 
 /usr/lib/elj/jar
@@ -46,8 +46,8 @@ Model
   - libC.jmod
   - libD.jmod
 
-/home/robot/app.shjar
+/home/robot/app.har
   - run application
-  - change its config
+  - extract itself
   - rebuild appcds cache
 ```
