@@ -1,3 +1,10 @@
+elj-base (1.0.2-3) stretch; urgency=low
+
+  * Add dependency on Java.
+
+ -- Jakub Vaněk (http://jakubvanekpc.jecool.net/) <linuxtardis@gmail.com>  Sun, 11 Nov 2018 22:14:37 +0100
+
+
 elj-base (1.0.2-2) stretch; urgency=low
 
   * Relax Java dependencies
