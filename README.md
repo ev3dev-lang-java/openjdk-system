@@ -1,7 +1,9 @@
-EV3DEV OpenJDK integration
-==========================
+EV3DEV OpenJDK integration (deprecated)
+=======================================
 
 This repo contains shell scripts integrating Java to ev3dev.
+
+This project has been superseded by the shell script wrapper feature added to the [template project](https://github.com/ev3dev-lang-java/template-project-gradle/).
 
 Model
 -----
